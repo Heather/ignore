@@ -9,7 +9,7 @@ my $dbg = False;
 my $gpattern;
 
 sub log($text) {
-  if ($dbg) { say $text; }
+  if $dbg { say $text; }
   }
 sub analyze($ig) {
   my $fh = open $ig, :r;
