@@ -28,26 +28,31 @@ sub MAIN($source, Bool :$debug = False) {
   log "source: $source";
   log "";
   
-  given $source.IO {
-    when :d {
-      given find(dir => $source, :recursive(False)).elems {
-        when 0 { 
-          say 'there is no files'; 
-          exit 0;
+  if $source ~~ /\*/ {
+    $gpattern = $source
+    }
+  else {
+    given $source.IO {
+      when :d {
+        given find(dir => $source, :recursive(False)).elems {
+          when 0 { 
+            say 'there is no files'; 
+            exit 0;
+            }
+          default { 
+            log 'found directory'; 
+            $gpattern = $source.fmt('/%s');
+            }
           }
-        default { 
-          log 'found directory'; 
-          $gpattern = $source.fmt('/%s');
-          }
+        } 
+      when :e & (:f | :l) { 
+        log 'found file or link'; 
+        $gpattern = $source.fmt('/%s');
         }
-      } 
-    when :e & (:f | :l) { 
-      log 'found file or link'; 
-      $gpattern = $source.fmt('/%s');
-      }
-    default {
-      say 'there is no such file or directory';
-      exit 0;
+      default {
+        say 'there is no such file or directory';
+        exit 0;
+        }
       }
     }
   my $res = find(:dir<.>, :name<.gitignore>);
