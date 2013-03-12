@@ -1,0 +1,1 @@
+PERL6LIB="perl6-File-Tools/lib" perl6 bin/ignore $@
