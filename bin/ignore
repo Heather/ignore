@@ -73,7 +73,7 @@ sub MAIN($source, Bool :$debug = False) {
     default { 
       log $res.elems.fmt('found %d .gitignore files'); 
       say ('WARNING: working with multiply .gitignore files is not supported yet');
-      if find(:dir<.>, :name<.gitignore>, :recursive(False)).elems = 1 {
+      if find(:dir<.>, :name<.gitignore>, :recursive(False)).elems == 1 {
         if analyze( ".gitignore" ) {
           log 'this file is already in root .gitignore file';
           }
