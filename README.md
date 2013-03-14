@@ -1,21 +1,34 @@
 Easiest way to ignore junk in your VCS folder
 =============================================
 
-Currently supported :
-	root level .gitignore
-	
+``` shell
+Currently supported : hg, git
+
 TODO :
-	multiply .gitignore
-	.hgingore
+ - multiply ignore files
 
-Usage :
-	ignore [--debug] <filename>
+Usage:
+  bin/ignore [--debug] [--git] [--hg] [--all] <source>
+```
 
-Thanks to
----------
-
- - https://github.com/tadzik/perl6-File-Tools/blob/master/lib/File/Find.pm
- - Google for all the stuff I learned about perl
- - UFO, for makefile
- - masak, for creating an gist which affects me to turn my eyes on perl
- - bonsaikitten, for being perl6 maintainer in my favorite distribution
+``` perl
+sub file($f,&b,*%h) {
+    given open $f, |%h {
+        .&b; .close
+    ...
+sub ignore($ifile, $pattern) {
+    my $res = find(:dir<.>, :name($ifile));
+    given $res.elems {
+        when 1 {
+            log $res[0].fmt('found single ignore file at %s');
+            if analyze( $res[0], $pattern ) {
+                log 'this file is already in ignore file';
+                }
+            else {
+                log 'adding new node to ignore file';
+                file $res[0], :a, {
+                    .say( $pattern );
+                ...
+sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, Bool :$all = False) {
+    ...
+```
