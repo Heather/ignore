@@ -8,6 +8,12 @@ my $dbg = False;
 
 my $gpattern;
 
+sub file($fname, &foo, *%mod) { 
+  my $fh = open $fname, |%mod;
+  foo($fh); 
+  LEAVE { $fh.close; } 
+  }
+
 sub log($text) {
   if $dbg { say $text; }
   }
@@ -64,16 +70,12 @@ sub MAIN($source, Bool :$debug = False) {
         }
       else {
         log 'adding new node to ignore file';
-        my $fh = open $res[0], :a;
-        $fh.say( $gpattern );
-        $fh.close;
+        file($res[0], :a, {.say( $gpattern );} );
         }
       }
     when 0 { 
       log 'no .gitignore file found, creating one with adding ignore pattern'; 
-      my $fh = open ".gitignore", :w;
-      $fh.say( $gpattern );
-      $fh.close;
+      file($res[0], :w, {.say( $gpattern );} );
       }
     default { 
       log $res.elems.fmt('found %d .gitignore files'); 
@@ -84,9 +86,7 @@ sub MAIN($source, Bool :$debug = False) {
           }
         else {
           say ('!!! writing to root .gitignore file !!!');
-          my $fh = open ".gitignore", :a;
-          $fh.say( $gpattern );
-          $fh.close;
+          file($res[0], :a, {.say( $gpattern );} );
           }
         }
       }
