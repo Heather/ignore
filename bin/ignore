@@ -67,8 +67,9 @@ sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, B
     log "source: $source\n";
     my $options = [$git, $hg];
     if $all {
-        $options[0] = True;
-        $options[1] = True;
+        for $options -> $op {
+            $op = True;
+            }
         }
     if ($options[0] == False && $options[1] == False) { $options[0] = True; } #Default
     if $source ~~ /\*|\(|\)/ {
