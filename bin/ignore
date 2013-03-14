@@ -65,11 +65,11 @@ sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, B
     my $ipattern;
     $dbg = $debug;
     log "source: $source\n";
-        my $options = [$git, $hg];
-        if $all {
-            $options[0] = True;
-            $options[1] = True;
-            }
+    my $options = [$git, $hg];
+    if $all {
+        $options[0] = True;
+        $options[1] = True;
+        }
     if ($options[0] == False && $options[1] == False) { $options[0] = True; } #Default
     if $source ~~ /\*|\(|\)/ {
         $ipattern = ($source, $source)
