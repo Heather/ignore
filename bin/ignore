@@ -72,7 +72,7 @@ sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, B
             }
         }
     #Default: git aka [0]
-    if any($options[]) == False { $options[0] = True; }
+    if all($options[]) == False { $options[0] = True; }
     if $source ~~ /\*|\(|\)/ {
         $ipattern = ($source, $source)
         }
