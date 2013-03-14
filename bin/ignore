@@ -12,14 +12,10 @@ sub log($text) {
     if $dbg { say $text; }
     }
 sub analyze($ig, $pattern) {
-    file $ig, :r, { 
-        for .lines -> $line {
-            if ($line eq $pattern) {
-                return True;
-                }
-            }
+    file $ig, :r, {
+        return any(.lines) eq $pattern ??
+            True !! False;
         };
-    return False;
     }
 sub form($src, $options) {
     return (
@@ -70,7 +66,7 @@ sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, B
     $dbg = $debug;
     log "source: $source\n";
         my $options = [$git, $hg];
-        if $a {
+        if $all {
             $options[0] = True;
             $options[1] = True;
             }
