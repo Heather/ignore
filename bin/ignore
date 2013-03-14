@@ -5,8 +5,8 @@ use File::Find;
 my $dbg = False;
 sub file($f,&b,*%h) { 
     given open $f, |%h { 
-		.&b; .close
-		}
+        .&b; .close
+        }
     }; 
 sub log($text) {
     if $dbg { say $text; }
@@ -22,11 +22,11 @@ sub analyze($ig, $pattern) {
     return False;
     }
 sub form($src, $options) {
-	return (
-		$options[0] ?? $src.fmt('/%s') 	!! '',
-		$options[1] ?? $src.fmt('%s')	!! ''
-		);
-	}
+    return (
+        $options[0] ?? $src.fmt('/%s') !! '',
+        $options[1] ?? $src.fmt('%s')  !! ''
+        );
+    }
 sub ignore($ifile, $pattern) {
     my $res = find(:dir<.>, :name($ifile));
     given $res.elems {
@@ -64,17 +64,17 @@ sub ignore($ifile, $pattern) {
                 }
             }
         }
-	}
+    }
 sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, Bool :$all = False) {
-	my $ipattern;
+    my $ipattern;
     $dbg = $debug;
     log "source: $source\n";
-	my $options = [$git, $hg];
-	if $a {
-		$options[0] 	= True;
-		$options[1]		= True;
-		}
-	if ($options[0] == False && $options[1] == False) { $options[0] = True; } #Default
+        my $options = [$git, $hg];
+        if $a {
+            $options[0] = True;
+            $options[1] = True;
+            }
+    if ($options[0] == False && $options[1] == False) { $options[0] = True; } #Default
     if $source ~~ /\*|\(|\)/ {
         $ipattern = ($source, $source)
         }
@@ -102,6 +102,6 @@ sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, B
                 }
             }
         }
-		if $options[0] { ignore(".gitignore", $ipattern[0]); }
-		if $options[1] { ignore(".hgignore", $ipattern[1]); }
+    if $options[0] { ignore(".gitignore", $ipattern[0]); }
+    if $options[1] { ignore(".hgignore", $ipattern[1]); }
     }
