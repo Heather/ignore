@@ -1,36 +1,82 @@
 #!/usr/bin/env perl6
-
 use v6;
-
 use File::Find;
 
 my $dbg = False;
-
-my $gpattern;
-
 sub file($f,&b,*%h) { 
-    given open $f, |%h { .&b; .close } 
+    given open $f, |%h { 
+		.&b; .close
+		}
     }; 
 sub log($text) {
     if $dbg { say $text; }
     }
-sub analyze($ig) {
+sub analyze($ig, $pattern) {
     file $ig, :r, { 
         for .lines -> $line {
-            if ($line eq $gpattern) {
+            if ($line eq $pattern) {
                 return True;
                 }
             }
         };
     return False;
     }
-sub MAIN($source, Bool :$debug = False) {
+sub form($src, $options) {
+	return (
+		$options[0] ?? $src.fmt('/%s') 	!! '',
+		$options[1] ?? $src.fmt('%s')	!! ''
+		);
+	}
+sub ignore($ifile, $pattern) {
+    my $res = find(:dir<.>, :name($ifile));
+    given $res.elems {
+        when 1 { 
+            log $res[0].fmt('found single ignore file at %s'); 
+            if analyze( $res[0], $pattern ) {
+                log 'this file is already in ignore file';
+                }
+            else {
+                log 'adding new node to ignore file';
+                file $res[0], :a, { 
+                    .say( $pattern ); 
+                    };
+                }
+            }
+        when 0 { 
+            log "no $ifile file found, creating one with adding ignore pattern"; 
+            file $ifile, :w, { 
+                .say( $pattern ); 
+                };
+            }
+        default { 
+            log $res.elems.fmt('found %d ignore files'); 
+            say ('WARNING: working with multiply ignore files is not supported yet');
+            if find(:dir<.>, :name($ifile), :recursive(False)).elems == 1 {
+                if analyze( $ifile ) {
+                    log 'this file is already in root ignore file';
+                    }
+                else {
+                    say ('!!! writing to root ignore file !!!');
+                    file $res[0], :a, { 
+                        .say( $pattern ); 
+                        };
+                    }
+                }
+            }
+        }
+	}
+sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, Bool :$all = False) {
+	my $ipattern;
     $dbg = $debug;
-    log "debug:  $debug";
-    log "source: $source";
-    log "";
-    if $source ~~ /\*/ {
-        $gpattern = $source
+    log "source: $source\n";
+	my $options = [$git, $hg];
+	if $a {
+		$options[0] 	= True;
+		$options[1]		= True;
+		}
+	if ($options[0] == False && $options[1] == False) { $options[0] = True; } #Default
+    if $source ~~ /\*|\(|\)/ {
+        $ipattern = ($source, $source)
         }
     else {
         given $source.IO {
@@ -42,13 +88,13 @@ sub MAIN($source, Bool :$debug = False) {
                         }
                     default { 
                         log 'found directory'; 
-                        $gpattern = $source.fmt('/%s');
+                        $ipattern = form($source, $options);
                         }
                     }
                 } 
             when :e & (:f | :l) { 
                 log 'found file or link'; 
-                $gpattern = $source.fmt('/%s');
+                $ipattern = form($source, $options);
                 }
             default {
                 say 'there is no such file or directory';
@@ -56,40 +102,6 @@ sub MAIN($source, Bool :$debug = False) {
                 }
             }
         }
-    my $res = find(:dir<.>, :name<.gitignore>);
-    given $res.elems {
-        when 1 { 
-            log $res[0].fmt('found single .gitignore file at %s'); 
-            if analyze( $res[0] ) {
-                log 'this file is already in ignore file';
-                }
-            else {
-                log 'adding new node to ignore file';
-                file $res[0], :a, { 
-                    .say( $gpattern ); 
-                    };
-                }
-            }
-        when 0 { 
-            log 'no .gitignore file found, creating one with adding ignore pattern'; 
-            file $res[0], :w, { 
-                .say( $gpattern ); 
-                };
-            }
-        default { 
-            log $res.elems.fmt('found %d .gitignore files'); 
-            say ('WARNING: working with multiply .gitignore files is not supported yet');
-            if find(:dir<.>, :name<.gitignore>, :recursive(False)).elems == 1 {
-                if analyze( ".gitignore" ) {
-                    log 'this file is already in root .gitignore file';
-                    }
-                else {
-                    say ('!!! writing to root .gitignore file !!!');
-                    file $res[0], :a, { 
-                        .say( $gpattern ); 
-                        };
-                    }
-                }
-            }
-        }
+		if $options[0] { ignore(".gitignore", $ipattern[0]); }
+		if $options[1] { ignore(".hgignore", $ipattern[1]); }
     }
