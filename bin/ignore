@@ -13,7 +13,7 @@ sub log($text) {
     }
 sub analyze($ig, $pattern) {
     f $ig, :r, { return any(.lines) eq $pattern ??
-				   True !! False; };
+                        True !! False; };
     }
 sub form($src, $options) {
     return (
