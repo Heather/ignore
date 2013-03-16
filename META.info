@@ -3,5 +3,5 @@
     "version"     : "*",
     "description" : "cli util that adds stuff to VCS ignore files",
     "depends"     : ["File::Tools"],
-    "source-url"  : "git://github.com/Cynede/ignore.git"
+    "source-url"  : "git://github.com/Heather/ignore.git"
 }
