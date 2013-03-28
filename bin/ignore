@@ -5,8 +5,7 @@ use File::Find;
 my $dbg = False;
 sub f($f,&b,*%h) {
     given open $f, |%h {
-        .&b; .close }
-    };
+        .&b; .close } };
 sub log($text) {
     if $dbg { say $text; } }
 sub analyze($ig, $pattern) {
@@ -39,7 +38,7 @@ sub ignore($ifile, $pattern) {
                 else {
                     say ('!!! writing to root ignore file !!!');
                     f $res[0], :a, { .say( $pattern ); }; } }
-            } } }
+                    } } }
 sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, Bool :$all = False) {
     my $ipattern;
     $dbg = $debug;
@@ -58,14 +57,14 @@ sub MAIN($source, Bool :$debug = False, Bool :$git = False, Bool :$hg = False, B
                     default {
                         log 'found directory';
                         $ipattern = form($source, $options); }
-                    } }
+                        } }
             when :e {
                 log 'found';
                 $ipattern = form($source, $options); }
             default {
                 say 'there is no such file or directory';
                 exit 0; }
-        } }
+                } }
     if $options[0] { ignore(".gitignore", $ipattern[0]); }
     if $options[1] { ignore(".hgignore", $ipattern[1]);  }
     }
