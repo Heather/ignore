@@ -2,6 +2,6 @@
     "name"        : "ignore",
     "version"     : "*",
     "description" : "cli util that adds stuff to VCS ignore files",
-    "depends"     : ["File::Tools"],
+    "depends"     : ["File::Find"],
     "source-url"  : "git://github.com/Heather/ignore.git"
 }
