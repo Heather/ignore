@@ -20,4 +20,4 @@ unlink("Makefile");
 given open $f, :r {
   ok .lines[0] eq "/$i";
   .close
-  }
+}
